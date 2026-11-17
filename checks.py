@@ -1,4 +1,5 @@
-"""Complete normal suite followed by a small actual resource-fixture exercise."""
+"""Complete normal suite, count-event audit and a small resource exercise."""
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -12,6 +13,9 @@ def main():
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         return 1
+    audit = subprocess.run([sys.executable, "-B", str(root / "count_audit.py")])
+    if audit.returncode:
+        return audit.returncode
     run_suite("compare", sizes=(32, 128), rounds=1)
     return 0
 

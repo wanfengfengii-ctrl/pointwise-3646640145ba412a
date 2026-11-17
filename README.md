@@ -7,11 +7,16 @@ Python 3.11 标准库实现的有限状态观测分析组件。它将有序观�
 ```sh
 python3.11 -B checks.py
 python3.11 -B demo.py
+python3.11 -B count_demo.py
 python3.11 -B bench.py baseline
 python3.11 -B bench.py compare
 ```
 
-checks.py 运行全部原回归、参照完整性检查和两个小规模的实际端到端计量。demo 在测试临时目录创建真实数据库，归档设备观测，打印顺序证据及报告，关闭后重新打开读取发布结果。bench 的正式两档是每类 10000、40000 时刻，各三轮；它输出实际耗时和 Python 分配峰值，不把正常物化实现解释成低内存实现。所有临时目录均由标准库生成并自动清理。
+checks.py 运行全部原回归、参照完整性检查、独立计数条件短路径核账和两个小规模的实际端到端计量。demo 在测试临时目录创建真实数据库，归档设备观测，打印顺序证据及报告，关闭后重新打开读取发布结果。count_demo 在同一归档上对比普通后验与“on 恰好出现一次”的计数条件后验，展示证据和窗口协方差如何同时被事件改变，再关闭重开读取冻结 CountAnalysis。bench 的正式两档是每类 10000、40000 时刻，各三轮；它输出实际耗时和 Python 分配峰值，不把正常物化实现解释成低内存实现。所有临时目录均由标准库生成并自动清理。
+
+## 区间计数条件
+
+`CountCondition(start, stop, state, count)` 与 `App.analyze_counts(recording_id, model_id, conditions, windows, evidence_sink)` 提供以一至两个左闭右开占用计数条件交集为事件的推断；新入口限 64 时刻，发布冻结 `CountAnalysis`（含 Analysis 全部字段、`conditions` 与 `log_event_probability`），`log_likelihood` 为 log P(O,E)。完整契约、手算样例和精度见 COUNTS.md，内部设计与交接见 COUNTS_HANDOFF.md，独立枚举核账为 count_audit.py，夹具样例为 count_examples.py。普通 analyze 接口、历史结果和原测试保持不变。
 
 ## 公开接口
 
